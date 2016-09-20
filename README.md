@@ -8,7 +8,6 @@ A boilerplate for Vue 2.0 + vue-router + vuex, with server-side rendering.
   - Vue + vue-router + vuex working together
   - Server-side data pre-fetching
   - Client-side state & DOM hydration
-- Single-file Vue Components
   - Hot-reload in development
   - CSS extraction for production
 - Real-time List Updates with FLIP Animation
