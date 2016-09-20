@@ -1,7 +1,9 @@
 import Firebase from 'firebase'
 import LRU from 'lru-cache'
+import config from '../config';
 
 const inBrowser = typeof window !== 'undefined'
+const apiURL = `${config.host}:${config.api.port}`;
 
 // When using bundleRenderer, the server-side application code runs in a new
 // context for each request. To allow caching across multiple requests, we need
@@ -43,7 +45,7 @@ function createServerSideAPI () {
   return api
 }
 
-function fetch (child) {
+function _fetch (child) {
   if (cache && cache.has(child)) {
     return Promise.resolve(cache.get(child))
   } else {
@@ -91,4 +93,13 @@ export function watchList (type, cb) {
   return () => {
     ref.off('value', handler)
   }
+}
+
+export function fetchPosts() {
+  console.log('apiURL:', apiURL)
+  return fetch(`${apiURL}/posts`)
+}
+
+function fetch(endpoint) {
+
 }

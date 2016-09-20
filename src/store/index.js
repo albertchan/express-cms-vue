@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import { fetchItem, fetchItems, fetchIdsByType, fetchUser } from './api'
+import { fetchItem, fetchItems, fetchIdsByType, fetchPosts, fetchUser } from './api'
 
 Vue.use(Vuex)
 
@@ -43,6 +43,10 @@ const store = new Vuex.Store({
       } else {
         return Promise.resolve()
       }
+    },
+
+    FETCH_POSTS: ({ commit, state }) => {
+      return fetchPosts().then(posts => commit('SET_ITEMS', { posts }))
     },
 
     FETCH_USER: ({ commit, state }, { id }) => {
