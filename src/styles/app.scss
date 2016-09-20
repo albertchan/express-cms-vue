@@ -1,0 +1,19 @@
+@import "bootstrap";
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background-color: lighten(#eceef1, 30%);
+  font-family: 'Roboto', 'Helvetica', sans-serif;
+  // -webkit-font-smoothing: antialiased;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: all .2s ease;
+}
+
+.fade-enter,
+.fade-leave-active {
+  opacity: 0;
+}
