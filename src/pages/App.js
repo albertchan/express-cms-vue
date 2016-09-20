@@ -5,13 +5,11 @@ const template = `
   <nav class="navbar navbar-default navbar-fixed-top">
     <div class="container">
       <div class="navbar-header">
-        <router-link to="/" class="navbar-brand" exact>
-          <img class="logo" src="/assets/logo.png" alt="logo">
-        </router-link>
+        <router-link to="/" class="navbar-brand" exact>Home</router-link>
       </div>
       <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
         <ul class="nav navbar-nav navbar-right">
-          <router-link to="/posts">Posts</router-link>
+          <li><router-link to="/posts">Posts</router-link></li>
         </ul>
       </div>
     </div>

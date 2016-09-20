@@ -1,10 +1,8 @@
 import Vue from 'vue';
 
 const template = `
-<div class="container">
-  <div class="row>">
-    Home
-  </div>
+<div class="container container-content">
+  Home
 </div>
 `;
 
