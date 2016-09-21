@@ -9,7 +9,11 @@ export default new Router({
   mode: 'history',
   scrollBehavior: () => ({ y: 0 }),
   routes: [
+    { path: '/profile', redirect: '/' },
+    { path: '/profile/:id', component: Profile },
     { path: '/posts', component: Posts },
-    { path: '/', component: Home }
+    { path: '/posts/:id', component: Posts },
+    { path: '/', component: Home },
+    { path: '*', redirect: '/' }
   ]
 })

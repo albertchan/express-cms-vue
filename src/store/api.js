@@ -1,9 +1,10 @@
-import Firebase from 'firebase'
-import LRU from 'lru-cache'
+import Request from 'axios';
+import Firebase from 'firebase';
+import LRU from 'lru-cache';
 import config from '../config';
 
 const inBrowser = typeof window !== 'undefined'
-const apiURL = `${config.host}:${config.api.port}`;
+const apiURL = `http://${config.host}:${config.api.port}/api/v1`;
 
 // When using bundleRenderer, the server-side application code runs in a new
 // context for each request. To allow caching across multiple requests, we need
@@ -61,7 +62,7 @@ function _fetch (child) {
   }
 }
 
-export function fetchIdsByType (type) {
+export function fetchIdsByType(type) {
   return api.__ids__ && api.__ids__[type]
     ? Promise.resolve(api.__ids__[type])
     : fetch(`${type}stories`)
@@ -96,10 +97,10 @@ export function watchList (type, cb) {
 }
 
 export function fetchPosts() {
-  console.log('apiURL:', apiURL)
-  return fetch(`${apiURL}/posts`)
+  const endpoint = `${apiURL}/posts`;
+  return fetch(endpoint)
 }
 
 function fetch(endpoint) {
-
+  return Request(endpoint);
 }

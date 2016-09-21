@@ -11,21 +11,25 @@ const store = new Vuex.Store({
     items: {/* [id: number]: Item */},
     users: {/* [id: string]: User */},
     lists: {
-      top: [/* number */],
-      new: [],
-      show: [],
-      ask: [],
-      job: []
+      post: [/* number */],
+      top: [],
+      user: []
     }
   },
 
   actions: {
     // ensure data for rendering given list type
     FETCH_LIST_DATA: ({ commit, dispatch, state }, { type }) => {
-      commit('SET_ACTIVE_TYPE', { type })
-      return fetchIdsByType(type)
-        .then(ids => commit('SET_LIST', { type, ids }))
-        .then(() => dispatch('ENSURE_ACTIVE_ITEMS'))
+      commit('SET_ACTIVE_TYPE', { type });
+
+      return fetchPosts().then(result => {
+        const items = result.data.posts;
+
+        commit('SET_ITEMS', { items });
+        commit('SET_LIST', { type, ids: Object.keys(state.items) });
+      }).catch(err => {
+        console.error('[store]:', err);
+      });
     },
 
     // ensure all active items are fetched
@@ -45,8 +49,15 @@ const store = new Vuex.Store({
       }
     },
 
-    FETCH_POSTS: ({ commit, state }) => {
-      return fetchPosts().then(posts => commit('SET_ITEMS', { posts }))
+    FETCH_POSTS: ({ commit, state }, { type }) => {
+      commit('SET_ACTIVE_TYPE', { type });
+
+      return fetchPosts().then(result => {
+        const items = result.data.posts;
+        commit('SET_ITEMS', { items });
+      }).catch(err => {
+        console.error('[store]:', err);
+      });
     },
 
     FETCH_USER: ({ commit, state }, { id }) => {
@@ -81,9 +92,10 @@ const store = new Vuex.Store({
   getters: {
     // ids of the items that should be currently displayed based on
     // current list type and current pagination
-    activeIds (state) {
-      const { activeType, itemsPerPage, lists } = state
-      const page = Number(state.route.params.page) || 1
+    activeIds(state) {
+      const { activeType, itemsPerPage, lists } = state;
+      const page = Number(state.route.params.page) || 1;
+
       if (activeType) {
         const start = (page - 1) * itemsPerPage
         const end = page * itemsPerPage
