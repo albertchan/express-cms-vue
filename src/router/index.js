@@ -12,11 +12,11 @@ export default new Router({
   scrollBehavior: () => ({ y: 0 }),
   routes: [
     { path: '/profiles', redirect: '/' },
-    { path: '/profiles/:id', component: ProfilePage('read') },
-    { path: '/profiles/:id/edit', component: ProfilePage('edit') },
-    { path: '/profiles/:id/posts', component: PostPage('list') },
-    { path: '/profiles/:id/posts/:post_id', component: PostPage ('read') },
-    { path: '/profiles/:id/posts/:post_id/edit', component: PostPage ('edit') },
+    { path: '/profiles/:user_id', component: ProfilePage('read') },
+    { path: '/profiles/:user_id/edit', component: ProfilePage('edit') },
+    { path: '/profiles/:user_id/posts', component: PostPage('list') },
+    { path: '/profiles/:user_id/posts/:post_id', component: PostPage ('read') },
+    { path: '/profiles/:user_id/posts/:post_id/edit', component: PostPage ('edit') },
     { path: '/', component: PostPage('list') },
     { path: '*', redirect: '/' }
   ]

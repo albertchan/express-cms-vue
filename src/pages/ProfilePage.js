@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import ProfileItem from '../components/ProfileItem';
 import Spinner from '../components/Spinner.vue';
 
 const templateEdit = `
@@ -10,6 +11,7 @@ const templateEdit = `
 const templateRead = `
 <div class="container container-content">
   <h2>User Profile</h2>
+  <profile-item :options="this.$route.params"><profile-item>
 </div>
 `;
 
@@ -20,13 +22,18 @@ export default function ProfilePage(type) {
     name: `profile-page`,
 
     components: {
+      ProfileItem,
       Spinner
     },
 
     template: template,
 
     beforeMount() {
-      fetchPosts(this.$store)
+      fetchProfile(this.$store)
     }
   }
+}
+
+function fetchProfile(store) {
+  return store.dispatch('FETCH_PROFILE', { id: store.state.route.params.id });
 }

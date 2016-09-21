@@ -96,9 +96,23 @@ export function watchList (type, cb) {
   }
 }
 
-export function fetchPosts() {
-  const endpoint = `${apiURL}/posts`;
-  return fetch(endpoint)
+// export function fetchPosts() {
+//   const endpoint = `${apiURL}/posts`;
+//   return fetch(endpoint);
+// }
+
+export function fetchPosts(options) {
+  const { user_id } = options;
+  const endpoint = isNaN(user_id)
+    ? `${apiURL}/posts`
+    : `${apiURL}/posts/@${user_id}`;
+
+  return fetch(endpoint);
+}
+
+export function fetchProfile(id) {
+  const endpoint =`${apiURL}/profiles/${id}`;
+  return fetch(endpoint);
 }
 
 function fetch(endpoint) {

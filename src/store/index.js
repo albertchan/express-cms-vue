@@ -1,6 +1,13 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import { fetchItem, fetchItems, fetchIdsByType, fetchPosts, fetchUser } from './api'
+import {
+  fetchItem,
+  fetchItems,
+  fetchIdsByType,
+  fetchPosts,
+  fetchProfile,
+  fetchUser
+} from './api'
 
 Vue.use(Vuex)
 
@@ -9,20 +16,23 @@ const store = new Vuex.Store({
     activeType: null,
     itemsPerPage: 20,
     items: {/* [id: number]: Item */},
+    profiles: {/* [id: string]: Profile */},
     users: {/* [id: string]: User */},
     lists: {
       post: [/* number */],
       top: [],
-      user: []
+      user: [],
+      profile: []
     }
   },
 
   actions: {
     // ensure data for rendering given list type
     FETCH_LIST_DATA: ({ commit, dispatch, state }, { type }) => {
+      const options = state.route.params || {};
       commit('SET_ACTIVE_TYPE', { type });
 
-      return fetchPosts().then(result => {
+      return fetchPosts(options).then(result => {
         const items = result.data.posts;
 
         commit('SET_ITEMS', { items });
@@ -60,6 +70,17 @@ const store = new Vuex.Store({
       });
     },
 
+    FETCH_PROFILE: ({ commit, state }, { id }) => {
+      console.log('state.profiles -->', state.profiles);
+      return state.profiles[id]
+        ? Promise.resolve(state.profiles[id])
+        : fetchProfile(id).then(profile => {
+            commit('SET_PROFILE', { profile })
+          }).catch(err => {
+            console.error('[store]:', err);
+          });
+    },
+
     FETCH_USER: ({ commit, state }, { id }) => {
       return state.users[id]
         ? Promise.resolve(state.users[id])
@@ -84,6 +105,11 @@ const store = new Vuex.Store({
       })
     },
 
+    SET_PROFILE: (state, { profile }) => {
+      console.log('profile -->', profile)
+      Vue.set(state.profiles, profile.id, profile)
+    },
+
     SET_USER: (state, { user }) => {
       Vue.set(state.users, user.id, user)
     }
@@ -95,6 +121,7 @@ const store = new Vuex.Store({
     activeIds(state) {
       const { activeType, itemsPerPage, lists } = state;
       const page = Number(state.route.params.page) || 1;
+      const filters = state.route.params || {};
 
       if (activeType) {
         const start = (page - 1) * itemsPerPage
@@ -103,6 +130,14 @@ const store = new Vuex.Store({
       } else {
         return []
       }
+    },
+
+    // items that should be currently displayed.
+    // this Array may not be fully fetched.
+    activeItem (state, getters) {
+      console.log('activeItem', state);
+      return {};
+      //return getters.activeIds.map(id => state.items[id]).filter(_ => _)
     },
 
     // items that should be currently displayed.

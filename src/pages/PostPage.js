@@ -11,7 +11,7 @@ const templateEdit = `
 const templateList = `
 <div class="container container-content">
   <h2>Posts</h2>
-  <posts-list type="post"></posts-list>
+  <posts-list type="post" :options="this.$route.params"></posts-list>
 </div>
 `;
 
@@ -21,7 +21,7 @@ const templateRead = `
 </div>
 `;
 
-export default function Posts(type) {
+export default function PostsPage(type) {
   let template;
 
   switch(type) {
