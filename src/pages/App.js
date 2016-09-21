@@ -9,7 +9,7 @@ const template = `
       </div>
       <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
         <ul class="nav navbar-nav navbar-right">
-          <li><router-link to="/posts">Posts</router-link></li>
+          <li><router-link to="/">Create post</router-link></li>
         </ul>
       </div>
     </div>
