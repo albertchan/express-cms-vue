@@ -5,13 +5,14 @@ import Spinner from '../components/Spinner.vue';
 const templateEdit = `
 <div class="container container-content">
   <h2>Edit Profile</h2>
+  <profile-item type="edit"><profile-item>
 </div>
 `;
 
 const templateRead = `
 <div class="container container-content">
   <h2>User Profile</h2>
-  <profile-item :options="this.$route.params"><profile-item>
+  <profile-item type="read"><profile-item>
 </div>
 `;
 
@@ -27,6 +28,8 @@ export default function ProfilePage(type) {
     },
 
     template: template,
+
+    preFetch: fetchProfile,
 
     beforeMount() {
       fetchProfile(this.$store)

@@ -1,6 +1,7 @@
 process.env.VUE_ENV = 'server'
 const isProd = process.env.NODE_ENV === 'production'
-
+const bodyParser = require('body-parser');
+const cors = require('cors');
 const fs = require('fs')
 const path = require('path')
 const resolve = file => path.resolve(__dirname, file)
@@ -12,6 +13,13 @@ const serialize = require('serialize-javascript')
 const createBundleRenderer = require('vue-server-renderer').createBundleRenderer
 
 const app = express()
+
+// Enable CORS
+app.use(cors());
+
+// parse application/x-www-form-urlencoded
+const urlencodedParser = bodyParser.urlencoded({ extended: false });
+app.use(urlencodedParser);
 
 // parse index.html template
 const html = (() => {
@@ -87,7 +95,7 @@ app.get('*', (req, res) => {
   })
 
   renderStream.on('error', err => {
-    throw err
+    throw err;
   })
 })
 

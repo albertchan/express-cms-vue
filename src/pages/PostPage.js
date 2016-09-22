@@ -1,4 +1,5 @@
 import Vue from 'vue';
+import PostItem from '../components/PostItem';
 import PostsList from '../components/PostsList';
 import Spinner from '../components/Spinner.vue';
 
@@ -17,7 +18,8 @@ const templateList = `
 
 const templateRead = `
 <div class="container container-content">
-  <h2>Posts</h2>
+  <h2>Read Posts</h2>
+  <posts-item :item=""></posts-item>
 </div>
 `;
 
@@ -43,6 +45,7 @@ export default function PostsPage(type) {
 
     components: {
       Spinner,
+      PostItem,
       PostsList
     },
 

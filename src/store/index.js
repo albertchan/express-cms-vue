@@ -6,7 +6,8 @@ import {
   fetchIdsByType,
   fetchPosts,
   fetchProfile,
-  fetchUser
+  fetchUser,
+  updateProfile
 } from './api'
 
 Vue.use(Vuex)
@@ -71,14 +72,28 @@ const store = new Vuex.Store({
     },
 
     FETCH_PROFILE: ({ commit, state }, { id }) => {
-      console.log('state.profiles -->', state.profiles);
+      const options = state.route.params || {};
+      id = id || options.user_id;
+
       return state.profiles[id]
         ? Promise.resolve(state.profiles[id])
         : fetchProfile(id).then(profile => {
-            commit('SET_PROFILE', { profile })
+            commit('SET_PROFILE', { profile: profile.data });
           }).catch(err => {
             console.error('[store]:', err);
           });
+    },
+
+    UPDATE_PROFILE: ({ commit, state }, { profile }) => {
+      const options = state.route.params || {};
+
+      return !options.user_id
+        ? Promise.resolve(state.profile)
+        : updateProfile(options.user_id, profile).then(result => {
+          console.log('updatedProfile -->', result);
+        }).catch(err => {
+          console.error('[store]:', err);
+        });
     },
 
     FETCH_USER: ({ commit, state }, { id }) => {
@@ -106,8 +121,7 @@ const store = new Vuex.Store({
     },
 
     SET_PROFILE: (state, { profile }) => {
-      console.log('profile -->', profile)
-      Vue.set(state.profiles, profile.id, profile)
+      state.profile = profile;
     },
 
     SET_USER: (state, { user }) => {
@@ -132,12 +146,9 @@ const store = new Vuex.Store({
       }
     },
 
-    // items that should be currently displayed.
-    // this Array may not be fully fetched.
-    activeItem (state, getters) {
-      console.log('activeItem', state);
-      return {};
-      //return getters.activeIds.map(id => state.items[id]).filter(_ => _)
+    // current profile for view
+    activeProfile (state) {
+      return state.profile;
     },
 
     // items that should be currently displayed.
