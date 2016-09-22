@@ -1,10 +1,13 @@
-import Request from 'axios';
 import Firebase from 'firebase';
 import LRU from 'lru-cache';
+import request from 'request-promise';
 import config from '../config';
 
 const inBrowser = typeof window !== 'undefined'
 const apiURL = `http://${config.host}:${config.api.port}/api/v1`;
+const Request = request.defaults({
+  headers: {'Access-Control-Allow-Origin': 'http://localhost:3001'}
+});
 
 // When using bundleRenderer, the server-side application code runs in a new
 // context for each request. To allow caching across multiple requests, we need
@@ -115,6 +118,25 @@ export function fetchProfile(id) {
   return fetch(endpoint);
 }
 
+export function updateProfile(id /* user_id */, dataObj) {
+  const endpoint =`${apiURL}/profiles/${id}/edit`;
+  return update(endpoint, dataObj);
+}
+
+function update(endpoint, dataObj) {
+  const options = {
+    method: 'POST',
+    uri: endpoint,
+    form: { name: 'Albert Chan' }, // Will be urlencoded
+    headers: {/* 'content-type': 'application/x-www-form-urlencoded' */}
+  };
+  return Request(options);
+}
+
 function fetch(endpoint) {
-  return Request(endpoint);
+  const options = {
+    uri: endpoint,
+    json: true
+  };
+  return Request(options);
 }

@@ -34,7 +34,8 @@ const store = new Vuex.Store({
       commit('SET_ACTIVE_TYPE', { type });
 
       return fetchPosts(options).then(result => {
-        const items = result.data.posts;
+        const items = result.posts;
+        // const items = result.data.posts;
 
         commit('SET_ITEMS', { items });
         commit('SET_LIST', { type, ids: Object.keys(state.items) });
@@ -78,7 +79,7 @@ const store = new Vuex.Store({
       return state.profiles[id]
         ? Promise.resolve(state.profiles[id])
         : fetchProfile(id).then(profile => {
-            commit('SET_PROFILE', { profile: profile.data });
+            commit('SET_PROFILE', { profile: profile });
           }).catch(err => {
             console.error('[store]:', err);
           });

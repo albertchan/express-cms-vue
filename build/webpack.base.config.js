@@ -60,5 +60,10 @@ module.exports = {
         browsers: ['last 3 versions']
       })
     ]
+  },
+  node: {
+    fs: 'empty',
+    net: 'empty',
+    tls: 'empty'
   }
 }
