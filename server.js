@@ -15,14 +15,14 @@ const createBundleRenderer = require('vue-server-renderer').createBundleRenderer
 const app = express()
 
 // Enable CORS
-const whitelist = ['http://localhost:3000', 'http://localhost:3001'];
-const corsOptions = {
-  origin: (origin, callback) => {
-    const originIsWhitelisted = whitelist.indexOf(origin) !== -1;
-    callback(originIsWhitelisted ? null : 'Bad Request', originIsWhitelisted);
-  }
-};
-app.use(cors(corsOptions));
+// const whitelist = ['http://localhost:3000', 'http://localhost:3001'];
+// const corsOptions = {
+//   origin: (origin, callback) => {
+//     const originIsWhitelisted = whitelist.indexOf(origin) !== -1;
+//     callback(originIsWhitelisted ? null : 'Bad Request', originIsWhitelisted);
+//   }
+// };
+app.use(cors());
 
 // parse application/x-www-form-urlencoded
 const urlencodedParser = bodyParser.urlencoded({ extended: false });

@@ -60,5 +60,5 @@ export default function PostsPage(type) {
 }
 
 function fetchPosts(store) {
-  return store.dispatch('FETCH_LIST_DATA', { type: 'post' });
+  return store.dispatch('FETCH_POSTS', { type: 'post' });
 }

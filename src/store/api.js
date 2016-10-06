@@ -1,53 +1,8 @@
-import Firebase from 'firebase';
-import LRU from 'lru-cache';
-import request from 'request-promise';
+import Request from 'request-promise';
 import config from '../config';
 
 const inBrowser = typeof window !== 'undefined'
 const apiURL = `http://${config.host}:${config.api.port}/api/v1`;
-const Request = request.defaults({
-  headers: {'Access-Control-Allow-Origin': 'http://localhost:3001'}
-});
-
-// When using bundleRenderer, the server-side application code runs in a new
-// context for each request. To allow caching across multiple requests, we need
-// to attach the cache to the process which is shared across all requests.
-const cache = inBrowser
-  ? null
-  : (process.__API_CACHE__ || (process.__API_CACHE__ = createCache()))
-
-function createCache () {
-  return LRU({
-    max: 1000,
-    maxAge: 1000 * 60 * 15 // 15 min cache
-  })
-}
-
-// create a single api instance for all server-side requests
-const api = inBrowser
-  ? new Firebase('https://hacker-news.firebaseio.com/v0')
-  : (process.__API__ || (process.__API__ = createServerSideAPI()))
-
-function createServerSideAPI () {
-  const api = new Firebase('https://hacker-news.firebaseio.com/v0')
-
-  // cache the latest story ids
-  api.__ids__ = {}
-  ;['top', 'new', 'show', 'ask', 'job'].forEach(type => {
-    api.child(`${type}stories`).on('value', snapshot => {
-      api.__ids__[type] = snapshot.val()
-    })
-  })
-
-  // warm the front page cache every 15 min
-  warmCache()
-  function warmCache () {
-    fetchItems((api.__ids__.top || []).slice(0, 30))
-    setTimeout(warmCache, 1000 * 60 * 15)
-  }
-
-  return api
-}
 
 function _fetch (child) {
   if (cache && cache.has(child)) {
@@ -65,12 +20,6 @@ function _fetch (child) {
   }
 }
 
-export function fetchIdsByType(type) {
-  return api.__ids__ && api.__ids__[type]
-    ? Promise.resolve(api.__ids__[type])
-    : fetch(`${type}stories`)
-}
-
 export function fetchItem (id) {
   return fetch(`item/${id}`)
 }
@@ -83,33 +32,27 @@ export function fetchUser (id) {
   return fetch(`user/${id}`)
 }
 
-export function watchList (type, cb) {
-  let first = true
-  const ref = api.child(`${type}stories`)
-  const handler = snapshot => {
-    if (first) {
-      first = false
-    } else {
-      cb(snapshot.val())
-    }
-  }
-  ref.on('value', handler)
-  return () => {
-    ref.off('value', handler)
-  }
+export function fetchPost(options) {
+  const { post_id, user_id } = options;
+  const endpoint = isNaN(post_id)
+    ? `${apiURL}/posts/${post_id}`
+    : `${apiURL}/profiles/${user_id}/posts/${post_id}`;
+
+  return fetch(endpoint);
 }
 
-// export function fetchPosts() {
-//   const endpoint = `${apiURL}/posts`;
-//   return fetch(endpoint);
-// }
-
 export function fetchPosts(options) {
-  const { user_id } = options;
-  const endpoint = isNaN(user_id)
-    ? `${apiURL}/posts`
-    : `${apiURL}/posts/@${user_id}`;
+  const opts = options || {};
+  let endpoint;
 
+  if (opts.user_id) {
+    endpoint = isNaN(opts.user_id)
+      ? `${apiURL}/posts/@${opts.user_id}`
+      : `${apiURL}/profiles/${opts.user_id}/posts`;
+  } else {
+    endpoint = `${apiURL}/posts`;
+  }
+  console.log('endpoint --->', endpoint);
   return fetch(endpoint);
 }
 
@@ -127,7 +70,7 @@ function update(endpoint, dataObj) {
   const options = {
     method: 'POST',
     uri: endpoint,
-    form: { name: 'Albert Chan' }, // Will be urlencoded
+    form: dataObj,
     headers: {/* 'content-type': 'application/x-www-form-urlencoded' */}
   };
   return Request(options);

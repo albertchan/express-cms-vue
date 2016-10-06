@@ -4,25 +4,31 @@ import {
   fetchItem,
   fetchItems,
   fetchIdsByType,
+  fetchPost,
   fetchPosts,
   fetchProfile,
   fetchUser,
   updateProfile
 } from './api'
 
-Vue.use(Vuex)
+Vue.use(Vuex);
+
+const anonymousUser = {
+  id: null,
+  displayName: 'Anonymous',
+};
 
 const store = new Vuex.Store({
   state: {
     activeType: null,
+    activeUser: anonymousUser,
     itemsPerPage: 20,
+    item: {},
     items: {/* [id: number]: Item */},
     profiles: {/* [id: string]: Profile */},
     users: {/* [id: string]: User */},
     lists: {
       post: [/* number */],
-      top: [],
-      user: [],
       profile: []
     }
   },
@@ -35,7 +41,6 @@ const store = new Vuex.Store({
 
       return fetchPosts(options).then(result => {
         const items = result.posts;
-        // const items = result.data.posts;
 
         commit('SET_ITEMS', { items });
         commit('SET_LIST', { type, ids: Object.keys(state.items) });
@@ -44,32 +49,25 @@ const store = new Vuex.Store({
       });
     },
 
-    // ensure all active items are fetched
-    ENSURE_ACTIVE_ITEMS: ({ dispatch, getters }) => {
-      return dispatch('FETCH_ITEMS', {
-        ids: getters.activeIds
-      })
+    FETCH_POST: ({ commit, state }, { options }) => {
+      return fetchPost(options)
+        .then(item => {
+          commit('SET_ITEM', { item });
+        })
+        .catch(err => {
+          console.error('[store]:', err);
+        });
     },
 
-    FETCH_ITEMS: ({ commit, state }, { ids }) => {
-      // only fetch items that we don't already have.
-      ids = ids.filter(id => !state.items[id])
-      if (ids.length) {
-        return fetchItems(ids).then(items => commit('SET_ITEMS', { items }))
-      } else {
-        return Promise.resolve()
-      }
-    },
-
-    FETCH_POSTS: ({ commit, state }, { type }) => {
-      commit('SET_ACTIVE_TYPE', { type });
-
-      return fetchPosts().then(result => {
-        const items = result.data.posts;
-        commit('SET_ITEMS', { items });
-      }).catch(err => {
-        console.error('[store]:', err);
-      });
+    FETCH_POSTS: ({ commit, state }, { options }) => {
+      return fetchPosts(options)
+        .then(result => {
+          const items = result.posts || [];
+          commit('SET_ITEMS', { items });
+        })
+        .catch(err => {
+          console.error('[store]:', err);
+        });
     },
 
     FETCH_PROFILE: ({ commit, state }, { id }) => {
@@ -91,16 +89,16 @@ const store = new Vuex.Store({
       return !options.user_id
         ? Promise.resolve(state.profile)
         : updateProfile(options.user_id, profile).then(result => {
-          console.log('updatedProfile -->', result);
+          //
         }).catch(err => {
-          console.error('[store]:', err);
+          console.error('[store]: (UPDATE_PROFILE)', err);
         });
     },
 
     FETCH_USER: ({ commit, state }, { id }) => {
       return state.users[id]
         ? Promise.resolve(state.users[id])
-        : fetchUser(id).then(user => commit('SET_USER', { user }))
+        : fetchUser(id).then(user => commit('SET_USER', { user }));
     }
   },
 
@@ -111,6 +109,10 @@ const store = new Vuex.Store({
 
     SET_LIST: (state, { type, ids }) => {
       state.lists[type] = ids
+    },
+
+    SET_ITEM: (state, { item }) => {
+      state.item = item;
     },
 
     SET_ITEMS: (state, { items }) => {
@@ -148,15 +150,23 @@ const store = new Vuex.Store({
     },
 
     // current profile for view
-    activeProfile (state) {
+    activeProfile(state) {
       return state.profile;
     },
 
     // items that should be currently displayed.
     // this Array may not be fully fetched.
-    activeItems (state, getters) {
+    activeItems(state, getters) {
       return getters.activeIds.map(id => state.items[id]).filter(_ => _)
-    }
+    },
+
+    item(state, getters) {
+      return state.item;
+    },
+
+    items(state, getters) {
+      return state.items;
+    },
   }
 })
 
